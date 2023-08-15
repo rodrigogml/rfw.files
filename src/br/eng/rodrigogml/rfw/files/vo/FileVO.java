@@ -65,7 +65,7 @@ public class FileVO extends RFWVO {
    * Nome do arquivo salvo. <br>
    * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a extenção e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} é avaliado para determinar a extenção correta a ser utilizada
    */
-  @RFWMetaStringField(caption = "Arquivo", maxlength = 255, required = true, pattern = "[^\\\\/<>\\?:\\|\\*\\\"]+\\.[^\\\\/<>\\?:\\|\\*\\\"]{1,4}")
+  @RFWMetaStringField(caption = "Arquivo", maxLength = 255, required = true, pattern = "[^\\\\/<>\\?:\\|\\*\\\"]+\\.[^\\\\/<>\\?:\\|\\*\\\"]{1,4}")
   private String name = null;
 
   /**
@@ -75,13 +75,13 @@ public class FileVO extends RFWVO {
    * Obs1: Os TagIDs do sistema ficam registrados como constantes em {@link BISSystem} com o prefixo "FILETAG_". Exemplo: {@link BISSystem#FILETAG_NFE_XML}.<br>
    * Obs2: Considere utilizar o método {@link B10File#createFileVO(FilePersistenceType, byte[], String, String, String, FileCompression)} ou similar para gerar o FileVO.
    */
-  @RFWMetaStringField(caption = "TagID", maxlength = 15, pattern = "\\w+", required = true)
+  @RFWMetaStringField(caption = "TagID", maxLength = 15, pattern = "\\w+", required = true)
   private String tagID = null;
 
   /**
    * Para arquivos persistidos no S3 não utilizaremos o nome do arquivo pois precisamos garantir um identificador único para que os arquivos não se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID é utilizado como nome do arquivo.
    */
-  @RFWMetaStringField(caption = "UUID do Arquivo", maxlength = 36, required = false, pattern = RUGenerators.UUID_REGEXP)
+  @RFWMetaStringField(caption = "UUID do Arquivo", maxLength = 36, required = false, pattern = RUGenerators.UUID_REGEXP)
   private String fileUUID = null;
 
   /**
@@ -112,7 +112,7 @@ public class FileVO extends RFWVO {
   /**
    * Encoding do conteúdo do arquivo. Geralmente utilizado para arquivos de Texto.
    */
-  @RFWMetaStringField(caption = "Encoding", maxlength = 15, required = false)
+  @RFWMetaStringField(caption = "Encoding", maxLength = 15, required = false)
   private String encoding = null;
 
   /**
@@ -131,7 +131,7 @@ public class FileVO extends RFWVO {
    * Chave de versão do arquivo quando no S3. Obrigatório quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
    * <b>ATENÇÃO:</B> Quando o FileVO tiver o conteúdo do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizará um novo post no S3 quando o versionID for nulo. Caso contrário assume que o arquivo continua sendo a versão passada.
    */
-  @RFWMetaStringField(caption = "ID Versão S3", maxlength = 50, required = false)
+  @RFWMetaStringField(caption = "ID Versão S3", maxLength = 50, required = false)
   private String versionID = null;
 
   /**
@@ -139,7 +139,7 @@ public class FileVO extends RFWVO {
    * Este caminho será utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
    * O caminho deve ser escrito no formato: "folder/subfolder1/.../subfolderN/" SEMPRE TERMINANDO COM "/"
    */
-  @RFWMetaStringField(caption = "Caminho", maxlength = 100, required = false, preProcess = PreProcessOption.STRING_SPACESCLEAN_TO_NULL)
+  @RFWMetaStringField(caption = "Caminho", maxLength = 100, required = false, preProcess = PreProcessOption.STRING_SPACESCLEAN_TO_NULL)
   private String basePath = null;
 
   /**
