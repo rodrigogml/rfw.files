@@ -1,10 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>br.eng.rodrigogml.rfw</groupId>
-  <artifactId>RFW.Files</artifactId>
-  <version>1.0</version>
-  <name>RFW.Files</name>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>br.eng.rodrigogml.rfw</groupId>
+	<artifactId>RFW.Files</artifactId>
+	<version>1.0</version>
+	<name>RFW.Files</name>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>srcTest</testSourceDirectory>
@@ -29,12 +31,13 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-<!--					<release>20</release>-->
-<!--					<encoding>UTF-8</encoding>-->
+					<!--					<release>20</release>-->
+					<!--					<encoding>UTF-8</encoding>-->
 				</configuration>
 			</plugin>
 			<!-- Copy project dependency -->
-<!--			Desligado já que o projeto não tem dependências para copiar além dos pacotes do RFW.Kernel-->
+			<!--			Desligado já que o projeto não tem dependências para copiar
+			além dos pacotes do RFW.Kernel-->
 <!--			<plugin>-->
 <!--				<groupId>org.apache.maven.plugins</groupId>-->
 <!--				<artifactId>maven-dependency-plugin</artifactId>-->
@@ -59,14 +62,15 @@
 
 	<dependencies>
 		<!-- junit - Utilizado para realizar os testes apenas -->
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<!--
+		https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>br.eng.rodrigogml.rfw</groupId>
 			<artifactId>RFW.Kernel</artifactId>
@@ -77,7 +81,7 @@
 			<artifactId>RFW.ORM</artifactId>
 			<version>1.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>s3</artifactId>
