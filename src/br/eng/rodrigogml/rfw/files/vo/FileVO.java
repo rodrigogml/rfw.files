@@ -124,7 +124,7 @@ public class FileVO extends RFWVO {
   /**
    * Conteúdo do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    */
-  @RFWMetaRelationshipField(caption = "Conteúdo", relationship = RelationshipTypes.COMPOSITION, required = false, columnMapped = "idk_file")
+  @RFWMetaRelationshipField(caption = "Conteúdo", relationship = RelationshipTypes.COMPOSITION, required = false)
   private FileContentVO fileContentVO = null;
 
   /**
