@@ -75,7 +75,7 @@ public class FileVO extends RFWVO {
    * Obs1: Os TagIDs do sistema ficam registrados como constantes em {@link BISSystem} com o prefixo "FILETAG_". Exemplo: {@link BISSystem#FILETAG_NFE_XML}.<br>
    * Obs2: Considere utilizar o método {@link B10File#createFileVO(FilePersistenceType, byte[], String, String, String, FileCompression)} ou similar para gerar o FileVO.
    */
-  @RFWMetaStringField(caption = "TagID", maxLength = 15, pattern = "\\w+", required = true)
+  @RFWMetaStringField(caption = "TagID", maxLength = 15, pattern = "[\\w ]+", required = true)
   private String tagID = null;
 
   /**
