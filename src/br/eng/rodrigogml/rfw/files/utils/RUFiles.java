@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -137,9 +138,7 @@ public class RUFiles {
     File zipFile = null;
     if (compression == null || compression == FileCompression.MAXIMUM_COMPRESSION) {
       String zipName = RUFile.extractFileName(fileVO.getName()) + ".zip";
-      String zipFilePath = RUZip.createNewZipFile(zipName, 9, new Object[][] {
-          { fileVO.getName(), new ByteArrayInputStream(content) }
-      });
+      String zipFilePath = RUZip.createNewZipFile(zipName, 9, new Object[][] { { fileVO.getName(), new ByteArrayInputStream(content) } });
       zipFile = new File(zipFilePath);
 
       if (compression == null) { // Se compression for nulo escolhemos conforme a economia de tamanho
@@ -197,22 +196,34 @@ public class RUFiles {
    * @throws RFWException
    */
   public static String processFileVOTempFile(FileVO vo) throws RFWException {
-    if (vo.getPersistenceType() != FilePersistenceType.S3) throw new RFWCriticalException("Este método só pode ser utilizado com Objetos persistidos no S3!");
-    if (vo.getTempPath() == null) throw new RFWCriticalException("É esperado que o FileVO já tenha com o arquivo temporário definido!");
+    final File file = RUFile.createFileInTemporaryPath(vo.getName());
+    InputStream is = null;
+    try {
 
-    switch (vo.getCompression()) {
-      case MAXIMUM_COMPRESSION:
-        try {
-          final File file = RUFile.createFileInTemporaryPath(vo.getName());
-          RUZip.extractZipEntry(new FileInputStream(vo.getTempPath()), vo.getName(), file);
-          return file.getAbsolutePath();
-        } catch (FileNotFoundException e) {
-          throw new RFWCriticalException("Falha ao lêr o arquivo temporário para obter o conteúdo do FilVO!", e);
-        }
-      case NONE:
-        return vo.getTempPath();
+      // Procura o conteúdo do arquivo primeiro em arquivo temporário, em seguida no FileContentVO.
+      if (vo.getTempPath() != null) {
+        is = new FileInputStream(vo.getTempPath());
+      } else {
+        PreProcess.requiredNonNull(vo.getFileContentVO());
+        PreProcess.requiredNonNull(vo.getFileContentVO().getContent());
+        is = new ByteArrayInputStream(vo.getFileContentVO().getContent());
+      }
+      PreProcess.requiredNonNullCritical(is, "Falha ao encontrar o conteúdo do arquivo compactado para processar!");
+
+      switch (vo.getCompression()) {
+        case MAXIMUM_COMPRESSION:
+          RUZip.extractZipEntry(is, vo.getName(), file);
+          break;
+
+        case NONE:
+          // Nenhum procesamento a ser feito se o conteúdo já é o conteúdod o arquivo, apenas escrevermos o conteúdo em um arquivo temporário
+          RUFile.writeFileContent(file, is);
+          break;
+      }
+
+    } catch (FileNotFoundException e) {
+      throw new RFWCriticalException("Falha ao lêr o arquivo temporário para obter o conteúdo do FilVO!", e);
     }
-
-    return null;
+    return file.getAbsolutePath();
   }
 }
