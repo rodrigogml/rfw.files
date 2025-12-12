@@ -45,7 +45,11 @@ public class RUFiles {
    */
   public static void moveFileContentVOToTemporaryFile(FileVO fileVO) throws RFWException {
     if (fileVO.getTempPath() == null && fileVO.getFileContentVO() != null && fileVO.getFileContentVO().getContent() != null && fileVO.getFileContentVO().getContent().length > 0) {
-      File file = RUFile.writeFileContentInTemporaryPathWithDelete(fileVO.getName(), fileVO.getFileContentVO().getContent(), 600000); // Exclui em 10 minutos
+      String fileName = null;
+      if (fileVO.getCompression() == FileCompression.MAXIMUM_COMPRESSION) {
+        fileName = RUFile.extractFileName(fileVO.getName()) + ".zip";
+      }
+      File file = RUFile.writeFileContentInTemporaryPathWithDelete(fileName, fileVO.getFileContentVO().getContent(), 600000); // Exclui em 10 minutos
       fileVO.setTempPath(file.getAbsolutePath());
       fileVO.setFileContentVO(null);
     }
@@ -114,6 +118,19 @@ public class RUFiles {
     fileVO.setCompression(compression);
 
     return updateFileVO(fileVO, content, encoding);
+  }
+
+  /**
+   * Método auxiliar para processar e escrever o contéudo no {@link FileVO} para ser persistido.<Br>
+   * Utiliza o encoding "UTF-8".
+   *
+   * @param fileVO Objeto a ser processado e escrito.
+   * @param content Conteúdo do arquivo.
+   * @return
+   * @throws RFWException
+   */
+  public static FileVO updateFileVOFromStringUTF8(FileVO fileVO, String content) throws RFWException {
+    return updateFileVO(fileVO, content.getBytes(StandardCharsets.UTF_8), "UTF-8");
   }
 
   /**

@@ -8,6 +8,7 @@ import br.eng.rodrigogml.rfw.files.utils.RUFiles;
 import br.eng.rodrigogml.rfw.files.vo.FileContentVO;
 import br.eng.rodrigogml.rfw.files.vo.FileContentVO_;
 import br.eng.rodrigogml.rfw.files.vo.FileVO;
+import br.eng.rodrigogml.rfw.files.vo.FileVO.FileCompression;
 import br.eng.rodrigogml.rfw.files.vo.FileVO.FilePersistenceType;
 import br.eng.rodrigogml.rfw.kernel.exceptions.RFWCriticalException;
 import br.eng.rodrigogml.rfw.kernel.exceptions.RFWException;
@@ -163,7 +164,11 @@ public class FilesCrud {
     PreProcess.requiredNonNullCritical(vo, "FileVO não pode ser nulo!");
     PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO não contem uma versionID definida!");
 
-    File file = RUFile.createFileInTemporaryPathWithDelete(vo.getName(), -1);
+    String fileName = vo.getName();
+    if (vo.getCompression() == FileCompression.MAXIMUM_COMPRESSION) {
+      fileName = RUFile.extractFileName(fileName) + ".zip";
+    }
+    File file = RUFile.createFileInTemporaryPathWithDelete(fileName, -1);
     rfws3.getObject(bucket, createS3FilePath(vo), vo.getVersionID(), file);
 
     vo.setTempPath(file.getAbsolutePath());
