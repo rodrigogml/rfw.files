@@ -168,7 +168,7 @@ public class FilesCrud {
     if (vo.getCompression() == FileCompression.MAXIMUM_COMPRESSION) {
       fileName = RUFile.extractFileName(fileName) + ".zip";
     }
-    File file = RUFile.createFileInTemporaryPathWithDelete(fileName, -1);
+    File file = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileName, -1);
     rfws3.getObject(bucket, createS3FilePath(vo), vo.getVersionID(), file);
 
     vo.setTempPath(file.getAbsolutePath());

@@ -191,7 +191,7 @@ public class RUFiles {
             break;
           case NONE:
             // Se não recebemos comando de compactação, criamos um arquivo temporário com o conteúdo original sem compactação
-            zipFile = RUFile.createFileInTemporaryPathWithDelete(fileVO.getName(), new String(content, Charset.forName(encoding)), Charset.forName(encoding), -1);
+            zipFile = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileVO.getName(), new String(content, Charset.forName(encoding)), Charset.forName(encoding), -1);
             break;
         }
         fileVO.setSize(zipFile.length());
@@ -213,7 +213,7 @@ public class RUFiles {
    * @throws RFWException
    */
   public static String processFileVOTempFile(FileVO vo) throws RFWException {
-    final File file = RUFile.createFileInTemporaryPath(vo.getName());
+    final File file = RUFile.createFileInGeneratedTemporaryPath(vo.getName());
     InputStream is = null;
     try {
 
