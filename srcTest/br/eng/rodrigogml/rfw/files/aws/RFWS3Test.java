@@ -61,10 +61,7 @@ public class RFWS3Test {
     StaticCredentialsProvider cred = StaticCredentialsProvider.create(AwsBasicCredentials.create(awsTestKey, awsTestSecret));
     S3Client s3 = S3Client.builder().region(awsTestRegion).credentialsProvider(cred).build();
 
-    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-        .bucket(awsTestBucker)
-        .key(awsTestFolder + RUGenerators.generateUUID() + ".pdf")
-        .build();
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(awsTestBucker).key(awsTestFolder + RUGenerators.generateUUID() + ".pdf").build();
 
     File file = new File(RFWS3Test.class.getResource("/resources/MySamplePDFFile.pdf").toURI());
     s3.putObject(putObjectRequest, file.getAbsoluteFile().toPath());
@@ -77,18 +74,12 @@ public class RFWS3Test {
 
     final String filePathKey = awsTestFolder + RUGenerators.generateUUID() + ".pdf";
 
-    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-        .bucket(awsTestBucker)
-        .key(filePathKey)
-        .build();
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(awsTestBucker).key(filePathKey).build();
 
     File file = new File(RFWS3Test.class.getResource("/resources/MySamplePDFFile.pdf").toURI());
     s3.putObject(putObjectRequest, file.getAbsoluteFile().toPath());
 
-    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-        .bucket(awsTestBucker)
-        .key(filePathKey)
-        .build();
+    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(awsTestBucker).key(filePathKey).build();
 
     // Delete the object
     s3.deleteObject(deleteObjectRequest);
@@ -106,7 +97,7 @@ public class RFWS3Test {
     assertNotNull(postResp.versionId());
 
     // ### Testa recuperar o arquivo
-    final File file = RUFile.createFileInTemporaryPath("MySamplePDFFile.pdf");
+    final File file = RUFile.createFileInGeneratedTemporaryPath("MySamplePDFFile.pdf");
     s3.getObject(bucketName, objectKeyName, postResp.versionId(), file);
     assertTrue(file.exists());
     assertTrue(file.length() > 0);
@@ -216,18 +207,12 @@ public class RFWS3Test {
     StaticCredentialsProvider cred = StaticCredentialsProvider.create(AwsBasicCredentials.create(awsTestKey, awsTestSecret));
     S3Client s3 = S3Client.builder().region(awsTestRegion).credentialsProvider(cred).build();
 
-    ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder()
-        .bucket(awsTestBucker)
-        .prefix(awsTestFolder)
-        .build();
+    ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(awsTestBucker).prefix(awsTestFolder).build();
 
     ListObjectsResponse objectListing = s3.listObjects(listObjectsRequest);
 
     for (S3Object object : objectListing.contents()) {
-      s3.deleteObject(DeleteObjectRequest.builder()
-          .bucket(awsTestBucker)
-          .key(object.key())
-          .build());
+      s3.deleteObject(DeleteObjectRequest.builder().bucket(awsTestBucker).key(object.key()).build());
     }
   }
 }
