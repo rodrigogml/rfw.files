@@ -22,7 +22,7 @@ import br.eng.rodrigogml.rfw.kernel.utils.RUGenerators;
 import br.eng.rodrigogml.rfw.kernel.utils.RUZip;
 
 /**
- * Description: Classe utilitária do módulo RFW.Files.<br>
+ * Description: Classe utilitÃ¡ria do mÃ³dulo RFW.Files.<br>
  *
  * @author Rodrigo GML
  * @since 10.0.0 (8 de ago. de 2023)
@@ -31,16 +31,16 @@ import br.eng.rodrigogml.rfw.kernel.utils.RUZip;
 public class RUFiles {
 
   /**
-   * Construtor privado para classe exclusivamente estática.
+   * Construtor privado para classe exclusivamente estÃ¡tica.
    */
   private RUFiles() {
   }
 
   /**
-   * Move o conteúdo do {@link FileContentVO} para um arquivo temporário e faz as alterações no {@link FileVO}.<bR>
-   * Este método é útil para mover o conteúdo da memória para o arquivo temporário. Na persistência do tipo S3 o padrão é utilizar o arquivo temporário, mas para passar o conteúdo pela fachada (de sistemas externos) é necessário carregar o conteúdo no {@link FileContentVO} e Vice Versa.
+   * Move o conteÃºdo do {@link FileContentVO} para um arquivo temporÃ¡rio e faz as alteraÃ§Ãµes no {@link FileVO}.<bR>
+   * Este mÃ©todo Ã© Ãºtil para mover o conteÃºdo da memÃ³ria para o arquivo temporÃ¡rio. Na persistÃªncia do tipo S3 o padrÃ£o Ã© utilizar o arquivo temporÃ¡rio, mas para passar o conteÃºdo pela fachada (de sistemas externos) Ã© necessÃ¡rio carregar o conteÃºdo no {@link FileContentVO} e Vice Versa.
    *
-   * @param fileVO FileVO com o conteúdo dento do {@link FileContentVO}
+   * @param fileVO FileVO com o conteÃºdo dento do {@link FileContentVO}
    * @throws RFWException
    */
   public static void moveFileContentVOToTemporaryFile(FileVO fileVO) throws RFWException {
@@ -56,10 +56,10 @@ public class RUFiles {
   }
 
   /**
-   * Move o conteúdo do arquivo temporário para o {@link FileContentVO} e faz as alterações no {@link FileVO}.<bR>
-   * Este método é útil para mover o conteúdo do arquivo para dentro do VO. O padrão de manter o arquivo no tipo de persistência S3 é em arquivo temporário, porém em algumas situações o conteúdo precisa ir dentro do VO (como para cruzar a fachada), nestes caso este método ajuda.
+   * Move o conteÃºdo do arquivo temporÃ¡rio para o {@link FileContentVO} e faz as alteraÃ§Ãµes no {@link FileVO}.<bR>
+   * Este mÃ©todo Ã© Ãºtil para mover o conteÃºdo do arquivo para dentro do VO. O padrÃ£o de manter o arquivo no tipo de persistÃªncia S3 Ã© em arquivo temporÃ¡rio, porÃ©m em algumas situaÃ§Ãµes o conteÃºdo precisa ir dentro do VO (como para cruzar a fachada), nestes caso este mÃ©todo ajuda.
    *
-   * @param fileVO FileVO com o conteúdo dento do FileContentVO
+   * @param fileVO FileVO com o conteÃºdo dento do FileContentVO
    * @throws RFWException
    */
   public static void moveTemporaryFileToFileContentVO(FileVO fileVO) throws RFWException {
@@ -73,16 +73,16 @@ public class RUFiles {
   }
 
   /**
-   * Cria um {@link FileVO} baseado em um conteúdo String. Utiliza o conteúdo da String para criar um arquivo de texto.<Br>
-   * O conteúdo será passado para bytes com o {@link StandardCharsets#UTF_8}
+   * Cria um {@link FileVO} baseado em um conteÃºdo String. Utiliza o conteÃºdo da String para criar um arquivo de texto.<Br>
+   * O conteÃºdo serÃ¡ passado para bytes com o {@link StandardCharsets#UTF_8}
    *
-   * @param persistenceType Tipo de persistência do arquivo, indicando onde será salvo.
-   * @param content Conteúdo binário do arquivo
+   * @param persistenceType Tipo de persistÃªncia do arquivo, indicando onde serÃ¡ salvo.
+   * @param content ConteÃºdo binÃ¡rio do arquivo
    * @param name nome do arquivo
    * @param tagID TagID do FileVO. Leia melhor em {@link FileVO#tagID}
-   * @param compression define o modelo de compressão a ser aplicado no conteúdo do arquivo. Leia sobre os modelos em {@link FileCompression}.<br>
-   *          Se for passado nulo neste atributo, o Método verificará o tipo de arquivo e decidirá o modelo de compessão sozinho. Pode demorar mais e aumentar o processamento a escolha automática.
-   * @return Retorna um objeto que estará pronto para ser persistido se {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
+   * @param compression define o modelo de compressÃ£o a ser aplicado no conteÃºdo do arquivo. Leia sobre os modelos em {@link FileCompression}.<br>
+   *          Se for passado nulo neste atributo, o MÃ©todo verificarÃ¡ o tipo de arquivo e decidirÃ¡ o modelo de compessÃ£o sozinho. Pode demorar mais e aumentar o processamento a escolha automÃ¡tica.
+   * @return Retorna um objeto que estarÃ¡ pronto para ser persistido se {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    *         Se for do tipo {@link FilePersistenceType#S3} o FileVO ainda precisa ser postado no S3 para ganhar os atributos de controle do arquivo.
    * @throws RFWException
    */
@@ -92,18 +92,18 @@ public class RUFiles {
 
   /**
    * Cria um {@link FileVO} para representar o arquivo.<br>
-   * Por padrão o método {@link #updateFileVO(FileVO, byte[], String)} (utilizado por este método), quando o modo de persistência é DB o conteúdo do arquivo é colocado dentro do FileContentVO, caso seja S3 o conteúdo é escrito em um arquivo temporário, e não carregado dentro do VO.<br>
-   * Caso deseje que o conteúdo fique dentro do VO (para passar por fachada, por exemplo) utilize o método {@link #moveTemporaryFileToFileContentVO(FileVO)} .
+   * Por padrÃ£o o mÃ©todo {@link #updateFileVO(FileVO, byte[], String)} (utilizado por este mÃ©todo), quando o modo de persistÃªncia Ã© DB o conteÃºdo do arquivo Ã© colocado dentro do FileContentVO, caso seja S3 o conteÃºdo Ã© escrito em um arquivo temporÃ¡rio, e nÃ£o carregado dentro do VO.<br>
+   * Caso deseje que o conteÃºdo fique dentro do VO (para passar por fachada, por exemplo) utilize o mÃ©todo {@link #moveTemporaryFileToFileContentVO(FileVO)} .
    *
-   * @param persistenceType Tipo de persistência do arquivo, indicando onde será salvo.
-   * @param content Conteúdo binário do arquivo. Este conteúdo ainda será comprimido dependendo do modelo de {@link FileCompression} passado.<br>
-   *          Note que se já se tratar de um arquivo comprimido, ou mesmo algum tipo de arquivo binário como Imagens em geral, o arquivo poderá ficar maior que o normal.
-   * @param encoding Encoding dos caracteres quando trata-se de um arquivo de texto. Essa informação é simplesmente salva no VO para orientar a leitura do arquivo. Nenhum processamento é realizado aqui.
+   * @param persistenceType Tipo de persistÃªncia do arquivo, indicando onde serÃ¡ salvo.
+   * @param content ConteÃºdo binÃ¡rio do arquivo. Este conteÃºdo ainda serÃ¡ comprimido dependendo do modelo de {@link FileCompression} passado.<br>
+   *          Note que se jÃ¡ se tratar de um arquivo comprimido, ou mesmo algum tipo de arquivo binÃ¡rio como Imagens em geral, o arquivo poderÃ¡ ficar maior que o normal.
+   * @param encoding Encoding dos caracteres quando trata-se de um arquivo de texto. Essa informaÃ§Ã£o Ã© simplesmente salva no VO para orientar a leitura do arquivo. Nenhum processamento Ã© realizado aqui.
    * @param name nome do arquivo
    * @param tagID TagID do FileVO. Leia melhor em {@link FileVO#tagID}
-   * @param compression define o modelo de compressão a ser aplicado no conteúdo do arquivo. Leia sobre os modelos em {@link FileCompression}.<br>
-   *          Se for passado nulo neste atributo, o Método verificará o tipo de arquivo e decidirá o modelo de compessão sozinho. Pode demorar mais e aumentar o processamento a escolha automática.
-   * @return Retorna um objeto que estará pronto para ser persistido se {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
+   * @param compression define o modelo de compressÃ£o a ser aplicado no conteÃºdo do arquivo. Leia sobre os modelos em {@link FileCompression}.<br>
+   *          Se for passado nulo neste atributo, o MÃ©todo verificarÃ¡ o tipo de arquivo e decidirÃ¡ o modelo de compessÃ£o sozinho. Pode demorar mais e aumentar o processamento a escolha automÃ¡tica.
+   * @return Retorna um objeto que estarÃ¡ pronto para ser persistido se {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    *         Se for do tipo {@link FilePersistenceType#S3} o FileVO ainda precisa ser postado no S3 para ganhar os atributos de controle do arquivo.
    * @throws RFWException
    */
@@ -121,11 +121,11 @@ public class RUFiles {
   }
 
   /**
-   * Método auxiliar para processar e escrever o contéudo no {@link FileVO} para ser persistido.<Br>
+   * MÃ©todo auxiliar para processar e escrever o contÃ©udo no {@link FileVO} para ser persistido.<Br>
    * Utiliza o encoding "UTF-8".
    *
    * @param fileVO Objeto a ser processado e escrito.
-   * @param content Conteúdo do arquivo.
+   * @param content ConteÃºdo do arquivo.
    * @return
    * @throws RFWException
    */
@@ -134,16 +134,16 @@ public class RUFiles {
   }
 
   /**
-   * Método auxiliar para processar e escrever o contéudo no {@link FileVO} para ser persistido.
+   * MÃ©todo auxiliar para processar e escrever o contÃ©udo no {@link FileVO} para ser persistido.
    *
    * @param fileVO Objeto a ser processado e escrito.
-   * @param content Conteúdo do arquivo.
-   * @param encoding Encoding do Conteúdo do FileVO.
+   * @param content ConteÃºdo do arquivo.
+   * @param encoding Encoding do ConteÃºdo do FileVO.
    * @return
    * @throws RFWException
    */
   public static FileVO updateFileVO(FileVO fileVO, byte[] content, String encoding) throws RFWException {
-    PreProcess.requiredNonNullCritical(fileVO, "FileVO não pode ser nulo!");
+    PreProcess.requiredNonNullCritical(fileVO, "FileVO nÃ£o pode ser nulo!");
     PreProcess.requiredNonNullCritical(fileVO.getPersistenceType(), "FileVO precisa ter o atributo 'persistenceType' definido!");
 
     final LocalDateTime now = RFW.getDateTime();
@@ -187,29 +187,29 @@ public class RUFiles {
       case S3:
         switch (compression) {
           case MAXIMUM_COMPRESSION:
-            // Mantemos o arquivo compactado que já criamos no início para comparação.
+            // Mantemos o arquivo compactado que jÃ¡ criamos no inÃ­cio para comparaÃ§Ã£o.
             break;
           case NONE:
-            // Se não recebemos comando de compactação, criamos um arquivo temporário com o conteúdo original sem compactação
+            // Se nÃ£o recebemos comando de compactaÃ§Ã£o, criamos um arquivo temporÃ¡rio com o conteÃºdo original sem compactaÃ§Ã£o
             zipFile = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileVO.getName(), new String(content, Charset.forName(encoding)), Charset.forName(encoding), -1);
             break;
         }
         fileVO.setSize(zipFile.length());
         fileVO.setTempPath(zipFile.getAbsolutePath());
         fileVO.setFileUUID(RUGenerators.generateUUID());
-        fileVO.setVersionID(null); // Garante que o FileVO será processado e persistido pelo Core
+        fileVO.setVersionID(null); // Garante que o FileVO serÃ¡ processado e persistido pelo Core
         break;
     }
     return fileVO;
   }
 
   /**
-   * Este método ajuda a extrair o arquivo correto do FileVO.<br>
-   * Considerando {@link FileVO} com o tipo de persistência do tipo {@link FilePersistenceType#S3}, o arquivo apontado por {@link FileVO#getTempPath()} pode ser um arquivo compactado de alguma forma, conforme definido no {@link FileVO#getCompression()}. Este método verifica todas essas condições e, se necessário descompacta e deixa o arquivo no formato correto novamente, retornando o caminho de
+   * Este mÃ©todo ajuda a extrair o arquivo correto do FileVO.<br>
+   * Considerando {@link FileVO} com o tipo de persistÃªncia do tipo {@link FilePersistenceType#S3}, o arquivo apontado por {@link FileVO#getTempPath()} pode ser um arquivo compactado de alguma forma, conforme definido no {@link FileVO#getCompression()}. Este mÃ©todo verifica todas essas condiÃ§Ãµes e, se necessÃ¡rio descompacta e deixa o arquivo no formato correto novamente, retornando o caminho de
    * onde encontrar o arquivo pronto.
    *
-   * @param vo FileVO para lêr as condições e encontrar o arquivo temporário. Deve vir com o {@link FileVO#getTempPath()}} já preenchido
-   * @return Caminho para o arquivo pronto para uso. Em algumas situações, pode retornar o mesmo Path do VO se não houver nenhum processamento apra ser realizado.
+   * @param vo FileVO para lÃªr as condiÃ§Ãµes e encontrar o arquivo temporÃ¡rio. Deve vir com o {@link FileVO#getTempPath()}} jÃ¡ preenchido
+   * @return Caminho para o arquivo pronto para uso. Em algumas situaÃ§Ãµes, pode retornar o mesmo Path do VO se nÃ£o houver nenhum processamento apra ser realizado.
    * @throws RFWException
    */
   public static String processFileVOTempFile(FileVO vo) throws RFWException {
@@ -217,7 +217,7 @@ public class RUFiles {
     InputStream is = null;
     try {
 
-      // Procura o conteúdo do arquivo primeiro em arquivo temporário, em seguida no FileContentVO.
+      // Procura o conteÃºdo do arquivo primeiro em arquivo temporÃ¡rio, em seguida no FileContentVO.
       if (vo.getTempPath() != null) {
         is = new FileInputStream(vo.getTempPath());
       } else {
@@ -225,7 +225,7 @@ public class RUFiles {
         PreProcess.requiredNonNull(vo.getFileContentVO().getContent());
         is = new ByteArrayInputStream(vo.getFileContentVO().getContent());
       }
-      PreProcess.requiredNonNullCritical(is, "Falha ao encontrar o conteúdo do arquivo compactado para processar!");
+      PreProcess.requiredNonNullCritical(is, "Falha ao encontrar o conteÃºdo do arquivo compactado para processar!");
 
       switch (vo.getCompression()) {
         case MAXIMUM_COMPRESSION:
@@ -233,13 +233,13 @@ public class RUFiles {
           break;
 
         case NONE:
-          // Nenhum procesamento a ser feito se o conteúdo já é o conteúdod o arquivo, apenas escrevermos o conteúdo em um arquivo temporário
+          // Nenhum procesamento a ser feito se o conteÃºdo jÃ¡ Ã© o conteÃºdod o arquivo, apenas escrevermos o conteÃºdo em um arquivo temporÃ¡rio
           RUFile.writeFileContent(file, is);
           break;
       }
 
     } catch (FileNotFoundException e) {
-      throw new RFWCriticalException("Falha ao lêr o arquivo temporário para obter o conteúdo do FilVO!", e);
+      throw new RFWCriticalException("Falha ao lÃªr o arquivo temporÃ¡rio para obter o conteÃºdo do FilVO!", e);
     }
     return file.getAbsolutePath();
   }

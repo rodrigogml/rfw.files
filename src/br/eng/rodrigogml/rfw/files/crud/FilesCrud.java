@@ -23,7 +23,7 @@ import br.eng.rodrigogml.rfw.orm.dao.RFWDAO;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 /**
- * Description: Classe de manipulaÁ„o dos objetos {@link FileVO}.<br>
+ * Description: Classe de manipula√ß√£o dos objetos {@link FileVO}.<br>
  *
  * @author Rodrigo GML
  * @since 1.0.0 (8 de ago. de 2023)
@@ -36,18 +36,18 @@ public class FilesCrud {
 
   /**
    * Persiste um {@link FileVO} no banco de dados, e realizar o post no S3.<br>
-   * <b>Note</b> que o posto no S3 sÛ È realizado se detectar que houve uma mudanÁa no arquivo. Onde "mudanÁa no arquivo" quer dizer que o atributo {@link FileVO#getVersionID()} est· nulo. Para garantir que o arquivo ser· atualizado na S3 o {@link FileVO} deve vir com o valor deste atributo definido como nulo.<br>
+   * <b>Note</b> que o posto no S3 s√≥ √© realizado se detectar que houve uma mudan√ßa no arquivo. Onde "mudan√ßa no arquivo" quer dizer que o atributo {@link FileVO#getVersionID()} est√° nulo. Para garantir que o arquivo ser√° atualizado na S3 o {@link FileVO} deve vir com o valor deste atributo definido como nulo.<br>
    * <br>
-   * <b>AtenÁ„o:</b> Este mÈtodo n„o È publicado na fachada, ele deve ser chamado diretamente do crud dos objetos que utilizam o FileVO.<br>
+   * <b>Aten√ß√£o:</b> Este m√©todo n√£o √© publicado na fachada, ele deve ser chamado diretamente do crud dos objetos que utilizam o FileVO.<br>
    * <br>
-   * Este mÈtodo ignora o <b>fullLoaded</b> do objeto. Por ser um objeto simples e sempre realizar uma validaÁ„o completa dos dados, n„o È necess·rio vir com a chancela de carregamento do Banco de dados.
+   * Este m√©todo ignora o <b>fullLoaded</b> do objeto. Por ser um objeto simples e sempre realizar uma valida√ß√£o completa dos dados, n√£o √© necess√°rio vir com a chancela de carregamento do Banco de dados.
    *
    * @param vo Objeto a ser persistido representando o arquivo.
-   * @param validator Validador com o {@link RFWDBProvider} definido para validaÁ„o no banco de dados.
+   * @param validator Validador com o {@link RFWDBProvider} definido para valida√ß√£o no banco de dados.
    * @param daoFile DAO do {@link FileVO} para acesso direto ao banco de dados.
-   * @param daoFileContent DAO do {@link FileContentVO} para acesso direto ao banco de dados. ObrigatÛrio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#DB}.
-   * @param rfws3 Inst‚ncia para manipulaÁ„o do S3 j· criado. ObrigatÛrio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
-   * @param bucket Nome do bucket do S3 para persistÍncia. ObrigatÛrio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @param daoFileContent DAO do {@link FileContentVO} para acesso direto ao banco de dados. Obrigat√≥rio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#DB}.
+   * @param rfws3 Inst√¢ncia para manipula√ß√£o do S3 j√° criado. Obrigat√≥rio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @param bucket Nome do bucket do S3 para persist√™ncia. Obrigat√≥rio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
    * @return Objeto conforme foi persistido (com o ID).
    * @throws RFWException
    */
@@ -61,7 +61,7 @@ public class FilesCrud {
             vo.setVersionID(null);
             break;
           case S3:
-            // No tipo S3 o conte˙do do arquivo pode vir por arquivo tempor·rio ou FileContentVO
+            // No tipo S3 o conte√∫do do arquivo pode vir por arquivo tempor√°rio ou FileContentVO
             break;
         }
       }
@@ -71,13 +71,13 @@ public class FilesCrud {
 
     switch (vo.getPersistenceType()) {
       case DB: {
-        if (vo.getFileContentVO() == null || vo.getFileContentVO().getContent() == null || vo.getFileContentVO().getContent().length == 0) throw new RFWValidationException("FileContentVO È obrigatÛrio para arquivos persistidos no banco de dados.");
+        if (vo.getFileContentVO() == null || vo.getFileContentVO().getContent() == null || vo.getFileContentVO().getContent().length == 0) throw new RFWValidationException("FileContentVO √© obrigat√≥rio para arquivos persistidos no banco de dados.");
 
-        // Para Garantir que n„o fiquem m˙ltiplos FileContentVO para o mesmo FileVO (caso o objeto venha incompleto de ID para persistir), excluÌmos FileContentVO que possam estar associados ‡ este FileVO
+        // Para Garantir que n√£o fiquem m√∫ltiplos FileContentVO para o mesmo FileVO (caso o objeto venha incompleto de ID para persistir), exclu√≠mos FileContentVO que possam estar associados √† este FileVO
         if (vo.getId() != null) {
           RFWMO mo = new RFWMO();
           mo.equal(FileContentVO_.vo().fileVO().id(), vo.getId());
-          if (vo.getFileContentVO().getId() != null) mo.notEqual(FileContentVO_._id, vo.getFileContentVO().getId()); // N„o permite encontrar o mesmo FileContentVO
+          if (vo.getFileContentVO().getId() != null) mo.notEqual(FileContentVO_._id, vo.getFileContentVO().getId()); // N√£o permite encontrar o mesmo FileContentVO
           FileContentVO oldVO = daoFileContent.findUniqueMatch(mo, null);
           if (oldVO != null) {
             daoFileContent.delete(oldVO.getId());
@@ -87,19 +87,19 @@ public class FilesCrud {
       }
         break;
       case S3: {
-        // Se for o S3, verificamos se n„o temos um id de vers„o temos de postar o arquivo para obter uma.
+        // Se for o S3, verificamos se n√£o temos um id de vers√£o temos de postar o arquivo para obter uma.
         if (vo.getVersionID() == null) {
-          if (vo.getFileUUID() == null) throw new RFWValidationException("FileUUID È obrigatÛrio È obrigatÛrio para arquivos persistidos no S3.");
+          if (vo.getFileUUID() == null) throw new RFWValidationException("FileUUID √© obrigat√≥rio √© obrigat√≥rio para arquivos persistidos no S3.");
           if (vo.getTempPath() == null && (vo.getFileContentVO() == null || vo.getFileContentVO().getContent() == null || vo.getFileContentVO().getContent().length == 0)) {
-            throw new RFWValidationException("N„o foi possÌvel encontrar o conte˙do do arquivo para persistir no S3.");
+            throw new RFWValidationException("N√£o foi poss√≠vel encontrar o conte√∫do do arquivo para persistir no S3.");
           }
 
-          // Para persistir no RFWS3 o conte˙do do arquivo precisa estar em um arquivo tempor·rio (n„o passa por Stream), assim garantimos que o conte˙do a ser persistido est· em um arquivo tempor·rio
+          // Para persistir no RFWS3 o conte√∫do do arquivo precisa estar em um arquivo tempor√°rio (n√£o passa por Stream), assim garantimos que o conte√∫do a ser persistido est√° em um arquivo tempor√°rio
           RUFiles.moveFileContentVOToTemporaryFile(vo);
 
           if (vo.getVersionID() == null) {
             final File file = new File(vo.getTempPath());
-            if (!file.exists()) throw new RFWCriticalException("O arquivo do FileVO n„o pode ser encontrado! Falha ao postar o arquivo.");
+            if (!file.exists()) throw new RFWCriticalException("O arquivo do FileVO n√£o pode ser encontrado! Falha ao postar o arquivo.");
 
             final String s3Path = createS3FilePath(vo);
 
@@ -124,9 +124,9 @@ public class FilesCrud {
   }
 
   /**
-   * Monta o filePath onde o arquivo ser· salvo na S3.
+   * Monta o filePath onde o arquivo ser√° salvo na S3.
    *
-   * @param fileVO Objeto com as informaÁıes para referÍncia.
+   * @param fileVO Objeto com as informa√ß√µes para refer√™ncia.
    * @return Caminho para salvar ou recuperar o arquivo do Bucket do S3.
    * @throws RFWException
    */
@@ -150,19 +150,19 @@ public class FilesCrud {
   }
 
   /**
-   * Recupera um arquivo que esteja armazenado no S3 fazendo o download e salvando em um arquivo tempor·rio no sistema.<br>
-   * O mÈtodo sÛ retorna depois que o download finalizar e o arquivo estiver disponÌvel. <Br>
-   * Este mÈtodo j· escreve no {@link FileVO#getTempPath()} o caminho para o arquivo tempor·rio com o conte˙do do arquivo.
+   * Recupera um arquivo que esteja armazenado no S3 fazendo o download e salvando em um arquivo tempor√°rio no sistema.<br>
+   * O m√©todo s√≥ retorna depois que o download finalizar e o arquivo estiver dispon√≠vel. <Br>
+   * Este m√©todo j√° escreve no {@link FileVO#getTempPath()} o caminho para o arquivo tempor√°rio com o conte√∫do do arquivo.
    *
-   * @param vo FileVO para acessar j· com as informaÁıes do arquivo. Mesma funÁ„o que o {@link #retrieveFileVOFromS3(Long)} mas evita a consulta no banco caso j· tenhamos o objeto em memÛria.
-   * @param rfws3 Inst‚ncia para manipulaÁ„o do S3 j· criado. ObrigatÛrio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
-   * @param bucket Nome do bucket do S3 para persistÍncia. ObrigatÛrio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
-   * @return O mesmo objeto recebido com o atributo {@link FileVO#getTempPath()} definido com o caminho do arquivo tempor·rio.
+   * @param vo FileVO para acessar j√° com as informa√ß√µes do arquivo. Mesma fun√ß√£o que o {@link #retrieveFileVOFromS3(Long)} mas evita a consulta no banco caso j√° tenhamos o objeto em mem√≥ria.
+   * @param rfws3 Inst√¢ncia para manipula√ß√£o do S3 j√° criado. Obrigat√≥rio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @param bucket Nome do bucket do S3 para persist√™ncia. Obrigat√≥rio quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @return O mesmo objeto recebido com o atributo {@link FileVO#getTempPath()} definido com o caminho do arquivo tempor√°rio.
    * @throws RFWException
    */
   public static FileVO retrieveFileVOFromS3(FileVO vo, RFWS3 rfws3, String bucket) throws RFWException {
-    PreProcess.requiredNonNullCritical(vo, "FileVO n„o pode ser nulo!");
-    PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO n„o contem uma versionID definida!");
+    PreProcess.requiredNonNullCritical(vo, "FileVO n√£o pode ser nulo!");
+    PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO n√£o contem uma versionID definida!");
 
     String fileName = vo.getName();
     if (vo.getCompression() == FileCompression.MAXIMUM_COMPRESSION) {

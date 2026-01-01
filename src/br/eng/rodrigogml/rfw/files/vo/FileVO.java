@@ -18,9 +18,9 @@ import br.eng.rodrigogml.rfw.kernel.vo.RFWVO;
 
 /**
  * Description: Classe que representa um arquivo utilizado pelo sistema.<br>
- * O Core do bis provÍ um sistema de armazemamento de arquivos diretamente no banco de dados para simplificar a vida dos desenvolvedores de mÛdulos.<br>
+ * O Core do bis prov√™ um sistema de armazemamento de arquivos diretamente no banco de dados para simplificar a vida dos desenvolvedores de m√≥dulos.<br>
  *
- * @author Rodrigo Leit„o
+ * @author Rodrigo Leit√£o
  * @since 3.1.0 (DEZ / 2009)
  */
 @SuppressWarnings("unused")
@@ -29,78 +29,78 @@ public class FileVO extends RFWVO {
   private static final long serialVersionUID = 938608718161221863L;
 
   /**
-   * Define o tipo de persistÍncia do arquivo.
+   * Define o tipo de persist√™ncia do arquivo.
    */
   public static enum FilePersistenceType {
     /**
-     * Indica que o conte˙do do arquivo È persistido no Banco de Dados.
+     * Indica que o conte√∫do do arquivo √© persistido no Banco de Dados.
      */
     DB,
     /**
-     * Indica que o conte˙do do arquivo È persistido e versionado no AWS S3.
+     * Indica que o conte√∫do do arquivo √© persistido e versionado no AWS S3.
      */
     S3
   }
 
   /**
-   * Modelos de compress„o do conte˙do suportados
+   * Modelos de compress√£o do conte√∫do suportados
    */
   public static enum FileCompression {
 
     /**
-     * O conte˙do do arquivo n„o est· comprimido.<br>
-     * Este modo È interessante quando o arquivo È muito utilizado, assim tiramos o overhead de processamento de descoprimi-lo o tempo todo.
+     * O conte√∫do do arquivo n√£o est√° comprimido.<br>
+     * Este modo √© interessante quando o arquivo √© muito utilizado, assim tiramos o overhead de processamento de descoprimi-lo o tempo todo.
      */
     NONE,
     /**
-     * Metodo de m·ximo de compress„o do BIS, utiliza a compress„o no m·ximo para diminuir o espaÁo utilizado em disco, mesmo que utilize mais processamento.<br>
-     * Este modo È ˙til quando os arquivos ser„o guardados por longo perÌodo de tempo e ser„o acessado poucas vezes.<Br>
+     * Metodo de m√°ximo de compress√£o do BIS, utiliza a compress√£o no m√°ximo para diminuir o espa√ßo utilizado em disco, mesmo que utilize mais processamento.<br>
+     * Este modo √© √∫til quando os arquivos ser√£o guardados por longo per√≠odo de tempo e ser√£o acessado poucas vezes.<Br>
      * <br>
-     * Obs: para ajudar a recuperar o arquivo original, indepentende do moto de compress„o utilizado, verifique o mÈtodo {@link B10File#processFileVOTempFile(FileVO)}.
+     * Obs: para ajudar a recuperar o arquivo original, indepentende do moto de compress√£o utilizado, verifique o m√©todo {@link B10File#processFileVOTempFile(FileVO)}.
      */
     MAXIMUM_COMPRESSION,
   }
 
   /**
    * Nome do arquivo salvo. <br>
-   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a extenÁ„o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} È avaliado para determinar a extenÁ„o correta a ser utilizada
+   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a exten√ß√£o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} √© avaliado para determinar a exten√ß√£o correta a ser utilizada
    */
   @RFWMetaStringField(caption = "Arquivo", maxLength = 255, required = true, pattern = "[^\\\\/<>\\?:\\|\\*\\\"]+\\.[^\\\\/<>\\?:\\|\\*\\\"]{1,4}")
   private String name = null;
 
   /**
-   * Tag com o nome do mÛdulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
-   * Caso seja salvo no S3, esse valor È colocado como o nome de um folder.<Br>
+   * Tag com o nome do m√≥dulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
+   * Caso seja salvo no S3, esse valor √© colocado como o nome de um folder.<Br>
    * <br>
    * Obs1: Os TagIDs do sistema ficam registrados como constantes em {@link BISSystem} com o prefixo "FILETAG_". Exemplo: {@link BISSystem#FILETAG_NFE_XML}.<br>
-   * Obs2: Considere utilizar o mÈtodo {@link B10File#createFileVO(FilePersistenceType, byte[], String, String, String, FileCompression)} ou similar para gerar o FileVO.
+   * Obs2: Considere utilizar o m√©todo {@link B10File#createFileVO(FilePersistenceType, byte[], String, String, String, FileCompression)} ou similar para gerar o FileVO.
    */
   @RFWMetaStringField(caption = "TagID", maxLength = 15, pattern = "[\\w ]+", required = true)
   private String tagID = null;
 
   /**
-   * Para arquivos persistidos no S3 n„o utilizaremos o nome do arquivo pois precisamos garantir um identificador ˙nico para que os arquivos n„o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID È utilizado como nome do arquivo.
+   * Para arquivos persistidos no S3 n√£o utilizaremos o nome do arquivo pois precisamos garantir um identificador √∫nico para que os arquivos n√£o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID √© utilizado como nome do arquivo.
    */
   @RFWMetaStringField(caption = "UUID do Arquivo", maxLength = 36, required = false, pattern = RUGenerators.UUID_REGEXP)
   private String fileUUID = null;
 
   /**
-   * Indica se o conte˙do do arquivo est· comprimido ou n„o.<Br>
-   * Quando comprimido È preciso descoprimir o conte˙do do arquivo antes de utiliza-lo.
+   * Indica se o conte√∫do do arquivo est√° comprimido ou n√£o.<Br>
+   * Quando comprimido √© preciso descoprimir o conte√∫do do arquivo antes de utiliza-lo.
    */
-  @RFWMetaEnumField(caption = "Compress„o", required = true)
+  @RFWMetaEnumField(caption = "Compress√£o", required = true)
   private FileCompression compression = null;
 
   /**
-   * Data de criaÁ„o do arquivo.
+   * Data de cria√ß√£o do arquivo.
    */
-  @RFWMetaDateField(caption = "Data CriaÁ„o", resolution = DateResolution.SECOND, required = true)
+  @RFWMetaDateField(caption = "Data Cria√ß√£o", resolution = DateResolution.SECOND, required = true)
   private LocalDateTime dateCreation = null;
 
   /**
-   * Data de modificaÁ„o do arquivo.
+   * Data de modifica√ß√£o do arquivo.
    */
-  @RFWMetaDateField(caption = "Data ModificaÁ„o", resolution = DateResolution.SECOND, required = true)
+  @RFWMetaDateField(caption = "Data Modifica√ß√£o", resolution = DateResolution.SECOND, required = true)
   private LocalDateTime dateModification = null;
 
   /**
@@ -110,52 +110,52 @@ public class FileVO extends RFWVO {
   private Long size = null;
 
   /**
-   * Encoding do conte˙do do arquivo. Geralmente utilizado para arquivos de Texto.
+   * Encoding do conte√∫do do arquivo. Geralmente utilizado para arquivos de Texto.
    */
   @RFWMetaStringField(caption = "Encoding", maxLength = 15, required = false)
   private String encoding = null;
 
   /**
-   * Local onde o arquivo È persistido.
+   * Local onde o arquivo √© persistido.
    */
-  @RFWMetaEnumField(caption = "Tipo de PersistÍncia", required = true)
+  @RFWMetaEnumField(caption = "Tipo de Persist√™ncia", required = true)
   private FilePersistenceType persistenceType = null;
 
   /**
-   * Conte˙do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
+   * Conte√∫do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    */
-  @RFWMetaRelationshipField(caption = "Conte˙do", relationship = RelationshipTypes.COMPOSITION, required = false)
+  @RFWMetaRelationshipField(caption = "Conte√∫do", relationship = RelationshipTypes.COMPOSITION, required = false)
   private FileContentVO fileContentVO = null;
 
   /**
-   * Chave de vers„o do arquivo quando no S3. ObrigatÛrio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * <b>ATEN«√O:</B> Quando o FileVO tiver o conte˙do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar· um novo post no S3 quando o versionID for nulo. Caso contr·rio assume que o arquivo continua sendo a vers„o passada.
+   * Chave de vers√£o do arquivo quando no S3. Obrigat√≥rio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * <b>ATEN√á√ÉO:</B> Quando o FileVO tiver o conte√∫do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar√° um novo post no S3 quando o versionID for nulo. Caso contr√°rio assume que o arquivo continua sendo a vers√£o passada.
    */
-  @RFWMetaStringField(caption = "ID Vers„o S3", maxLength = 50, required = false)
+  @RFWMetaStringField(caption = "ID Vers√£o S3", maxLength = 50, required = false)
   private String versionID = null;
 
   /**
    * Caminho base do arquivo (pastas).<br>
-   * Este caminho ser· utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
+   * Este caminho ser√° utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
    * O caminho deve ser escrito no formato: "folder/subfolder1/.../subfolderN/" SEMPRE TERMINANDO COM "/"
    */
   @RFWMetaStringField(caption = "Caminho", maxLength = 100, required = false, preProcess = PreProcessOption.STRING_SPACESCLEAN_TO_NULL)
   private String basePath = null;
 
   /**
-   * Caminho para o arquivo tempor·rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * Este atributo n„o È persistido no banco de dados pois È um caminho tempor·rio.<br>
-   * Para persistir o FileVO no S3 este atributo È obrigatÛrio, pois o arquivo que ser· postado no S3 ser· lido desse caminho.<br>
-   * Quando o FileVO for recuperado do banco de dados este atributo vir· nulo. ApÛs chamar o mÈtodo de recuperaÁ„o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
-   * Note que o Crud n„o verifica o conte˙do do arquivo para determinar se houve ou n„o alteraÁ„o. Para que o CRUD saiba que o conte˙do do arquivo mudou o conte˙do de {@link #versionID} deve ser definido como null.<br>
-   * O conte˙do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress„o o conte˙do deste arquivo j· deve estar comprimido conforme a definiÁ„o, se n„o houver, dever· ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao lÍr o conte˙do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
+   * Caminho para o arquivo tempor√°rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * Este atributo n√£o √© persistido no banco de dados pois √© um caminho tempor√°rio.<br>
+   * Para persistir o FileVO no S3 este atributo √© obrigat√≥rio, pois o arquivo que ser√° postado no S3 ser√° lido desse caminho.<br>
+   * Quando o FileVO for recuperado do banco de dados este atributo vir√° nulo. Ap√≥s chamar o m√©todo de recupera√ß√£o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
+   * Note que o Crud n√£o verifica o conte√∫do do arquivo para determinar se houve ou n√£o altera√ß√£o. Para que o CRUD saiba que o conte√∫do do arquivo mudou o conte√∫do de {@link #versionID} deve ser definido como null.<br>
+   * O conte√∫do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress√£o o conte√∫do deste arquivo j√° deve estar comprimido conforme a defini√ß√£o, se n√£o houver, dever√° ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao l√™r o conte√∫do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
    */
-  // SEM @BISMETA PQ ESSE ATRIBUTO N¬O … PERSISTIDO
+  // SEM @BISMETA PQ ESSE ATRIBUTO N√ÇO √â PERSISTIDO
   private String tempPath = null;
 
   /**
    * # nome do arquivo salvo. <br>
-   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a extenÁ„o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} È avaliado para determinar a extenÁ„o correta a ser utilizada.
+   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a exten√ß√£o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} √© avaliado para determinar a exten√ß√£o correta a ser utilizada.
    *
    * @return the nome do arquivo salvo
    */
@@ -165,7 +165,7 @@ public class FileVO extends RFWVO {
 
   /**
    * # nome do arquivo salvo. <br>
-   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a extenÁ„o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} È avaliado para determinar a extenÁ„o correta a ser utilizada.
+   * Mesmo que no modo {@link FilePersistenceType#S3} o arquivo seja comprimido (enviado como .zip para o S3) aqui a exten√ß√£o e nome do arquivo continuaram intactos. No momento de recuperar o arquivo do S3 o valor de {@link FileCompression} √© avaliado para determinar a exten√ß√£o correta a ser utilizada.
    *
    * @param name the new nome do arquivo salvo
    */
@@ -174,36 +174,36 @@ public class FileVO extends RFWVO {
   }
 
   /**
-   * # data de criaÁ„o do arquivo.
+   * # data de cria√ß√£o do arquivo.
    *
-   * @return the data de criaÁ„o do arquivo
+   * @return the data de cria√ß√£o do arquivo
    */
   public LocalDateTime getDateCreation() {
     return dateCreation;
   }
 
   /**
-   * # data de criaÁ„o do arquivo.
+   * # data de cria√ß√£o do arquivo.
    *
-   * @param dateCreation the new data de criaÁ„o do arquivo
+   * @param dateCreation the new data de cria√ß√£o do arquivo
    */
   public void setDateCreation(LocalDateTime dateCreation) {
     this.dateCreation = dateCreation;
   }
 
   /**
-   * # data de modificaÁ„o do arquivo.
+   * # data de modifica√ß√£o do arquivo.
    *
-   * @return the data de modificaÁ„o do arquivo
+   * @return the data de modifica√ß√£o do arquivo
    */
   public LocalDateTime getDateModification() {
     return dateModification;
   }
 
   /**
-   * # data de modificaÁ„o do arquivo.
+   * # data de modifica√ß√£o do arquivo.
    *
-   * @param dateModification the new data de modificaÁ„o do arquivo
+   * @param dateModification the new data de modifica√ß√£o do arquivo
    */
   public void setDateModification(LocalDateTime dateModification) {
     this.dateModification = dateModification;
@@ -228,162 +228,162 @@ public class FileVO extends RFWVO {
   }
 
   /**
-   * # conte˙do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
+   * # conte√∫do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    * .
    *
-   * @return the conte˙do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}
+   * @return the conte√∫do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}
    */
   public FileContentVO getFileContentVO() {
     return fileContentVO;
   }
 
   /**
-   * # conte˙do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
+   * # conte√∫do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}.<br>
    * .
    *
-   * @param fileContentVO the new conte˙do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}
+   * @param fileContentVO the new conte√∫do do arquivo quando persistido no banco de dados {@link FilePersistenceType} = {@link FilePersistenceType#DB}
    */
   public void setFileContentVO(FileContentVO fileContentVO) {
     this.fileContentVO = fileContentVO;
   }
 
   /**
-   * # encoding do conte˙do do arquivo. Geralmente utilizado para arquivos de Texto.
+   * # encoding do conte√∫do do arquivo. Geralmente utilizado para arquivos de Texto.
    *
-   * @return the encoding do conte˙do do arquivo
+   * @return the encoding do conte√∫do do arquivo
    */
   public String getEncoding() {
     return encoding;
   }
 
   /**
-   * # encoding do conte˙do do arquivo. Geralmente utilizado para arquivos de Texto.
+   * # encoding do conte√∫do do arquivo. Geralmente utilizado para arquivos de Texto.
    *
-   * @param encoding the new encoding do conte˙do do arquivo
+   * @param encoding the new encoding do conte√∫do do arquivo
    */
   public void setEncoding(String encoding) {
     this.encoding = encoding;
   }
 
   /**
-   * # local onde o arquivo È persistido.
+   * # local onde o arquivo √© persistido.
    *
-   * @return the local onde o arquivo È persistido
+   * @return the local onde o arquivo √© persistido
    */
   public FilePersistenceType getPersistenceType() {
     return persistenceType;
   }
 
   /**
-   * # local onde o arquivo È persistido.
+   * # local onde o arquivo √© persistido.
    *
-   * @param persistenceType the new local onde o arquivo È persistido
+   * @param persistenceType the new local onde o arquivo √© persistido
    */
   public void setPersistenceType(FilePersistenceType persistenceType) {
     this.persistenceType = persistenceType;
   }
 
   /**
-   * # chave de vers„o do arquivo quando no S3. ObrigatÛrio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * <b>ATEN«√O:</B> Quando o FileVO tiver o conte˙do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar· um novo post no S3 quando o versionID for nulo. Caso contr·rio assume que o arquivo continua sendo a vers„o passada.
+   * # chave de vers√£o do arquivo quando no S3. Obrigat√≥rio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * <b>ATEN√á√ÉO:</B> Quando o FileVO tiver o conte√∫do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar√° um novo post no S3 quando o versionID for nulo. Caso contr√°rio assume que o arquivo continua sendo a vers√£o passada.
    *
-   * @return the chave de vers„o do arquivo quando no S3
+   * @return the chave de vers√£o do arquivo quando no S3
    */
   public String getVersionID() {
     return versionID;
   }
 
   /**
-   * # chave de vers„o do arquivo quando no S3. ObrigatÛrio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * <b>ATEN«√O:</B> Quando o FileVO tiver o conte˙do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar· um novo post no S3 quando o versionID for nulo. Caso contr·rio assume que o arquivo continua sendo a vers„o passada.
+   * # chave de vers√£o do arquivo quando no S3. Obrigat√≥rio quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * <b>ATEN√á√ÉO:</B> Quando o FileVO tiver o conte√∫do do arquivo alterado, e tivermos de postar um novo arquivo o versionID deve ser definido para nulo. o CRUD realizar√° um novo post no S3 quando o versionID for nulo. Caso contr√°rio assume que o arquivo continua sendo a vers√£o passada.
    *
-   * @param versionID the new chave de vers„o do arquivo quando no S3
+   * @param versionID the new chave de vers√£o do arquivo quando no S3
    */
   public void setVersionID(String versionID) {
     this.versionID = versionID;
   }
 
   /**
-   * # tag com o nome do mÛdulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
-   * Caso seja salvo no S3, esse valor È colocado como o nome de um folder.
+   * # tag com o nome do m√≥dulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
+   * Caso seja salvo no S3, esse valor √© colocado como o nome de um folder.
    *
-   * @return the tag com o nome do mÛdulo dono do arquivo
+   * @return the tag com o nome do m√≥dulo dono do arquivo
    */
   public String getTagID() {
     return tagID;
   }
 
   /**
-   * # tag com o nome do mÛdulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
-   * Caso seja salvo no S3, esse valor È colocado como o nome de um folder.
+   * # tag com o nome do m√≥dulo dono do arquivo. Esta tag ajuda em caso de problemas a identificar o arquivo e encontra-lo.<br>
+   * Caso seja salvo no S3, esse valor √© colocado como o nome de um folder.
    *
-   * @param tagID the new tag com o nome do mÛdulo dono do arquivo
+   * @param tagID the new tag com o nome do m√≥dulo dono do arquivo
    */
   public void setTagID(String tagID) {
     this.tagID = tagID;
   }
 
   /**
-   * # caminho para o arquivo tempor·rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * Este atributo n„o È persistido no banco de dados pois È um caminho tempor·rio.<br>
-   * Para persistir o FileVO no S3 este atributo È obrigatÛrio, pois o arquivo que ser· postado no S3 ser· lido desse caminho.<br>
-   * Quando o FileVO for recuperado do banco de dados este atributo vir· nulo. ApÛs chamar o mÈtodo de recuperaÁ„o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
-   * Note que o Crud n„o verifica o conte˙do do arquivo para determinar se houve ou n„o alteraÁ„o. Para que o CRUD saiba que o conte˙do do arquivo mudou o conte˙do de {@link #versionID} deve ser definido como null.<br>
-   * O conte˙do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress„o o conte˙do deste arquivo j· deve estar comprimido conforme a definiÁ„o, se n„o houver, dever· ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao lÍr o conte˙do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
+   * # caminho para o arquivo tempor√°rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * Este atributo n√£o √© persistido no banco de dados pois √© um caminho tempor√°rio.<br>
+   * Para persistir o FileVO no S3 este atributo √© obrigat√≥rio, pois o arquivo que ser√° postado no S3 ser√° lido desse caminho.<br>
+   * Quando o FileVO for recuperado do banco de dados este atributo vir√° nulo. Ap√≥s chamar o m√©todo de recupera√ß√£o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
+   * Note que o Crud n√£o verifica o conte√∫do do arquivo para determinar se houve ou n√£o altera√ß√£o. Para que o CRUD saiba que o conte√∫do do arquivo mudou o conte√∫do de {@link #versionID} deve ser definido como null.<br>
+   * O conte√∫do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress√£o o conte√∫do deste arquivo j√° deve estar comprimido conforme a defini√ß√£o, se n√£o houver, dever√° ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao l√™r o conte√∫do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
    *
-   * @return the caminho para o arquivo tempor·rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}
+   * @return the caminho para o arquivo tempor√°rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}
    */
   public String getTempPath() {
     return tempPath;
   }
 
   /**
-   * # caminho para o arquivo tempor·rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
-   * Este atributo n„o È persistido no banco de dados pois È um caminho tempor·rio.<br>
-   * Para persistir o FileVO no S3 este atributo È obrigatÛrio, pois o arquivo que ser· postado no S3 ser· lido desse caminho.<br>
-   * Quando o FileVO for recuperado do banco de dados este atributo vir· nulo. ApÛs chamar o mÈtodo de recuperaÁ„o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
-   * Note que o Crud n„o verifica o conte˙do do arquivo para determinar se houve ou n„o alteraÁ„o. Para que o CRUD saiba que o conte˙do do arquivo mudou o conte˙do de {@link #versionID} deve ser definido como null.<br>
-   * O conte˙do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress„o o conte˙do deste arquivo j· deve estar comprimido conforme a definiÁ„o, se n„o houver, dever· ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao lÍr o conte˙do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
+   * # caminho para o arquivo tempor√°rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}.<br>
+   * Este atributo n√£o √© persistido no banco de dados pois √© um caminho tempor√°rio.<br>
+   * Para persistir o FileVO no S3 este atributo √© obrigat√≥rio, pois o arquivo que ser√° postado no S3 ser√° lido desse caminho.<br>
+   * Quando o FileVO for recuperado do banco de dados este atributo vir√° nulo. Ap√≥s chamar o m√©todo de recupera√ß√£o do arquivo no S3 o caminho para o arquivo baixado deve ser salvo aqui.<br>
+   * Note que o Crud n√£o verifica o conte√∫do do arquivo para determinar se houve ou n√£o altera√ß√£o. Para que o CRUD saiba que o conte√∫do do arquivo mudou o conte√∫do de {@link #versionID} deve ser definido como null.<br>
+   * O conte√∫do do arquivo tempPath deve sempre acompanhar o valor definido em {@link #compression}. Ou seja, se ouver compress√£o o conte√∫do deste arquivo j√° deve estar comprimido conforme a defini√ß√£o, se n√£o houver, dever√° ser o arquivo "pleno", e assim por diante. Assim, <b>Cuidado ao l√™r o conte√∫do deste arquivo</b> pois ele pode estar comprimido e precisa de tratamento antes.
    *
-   * @param tempPath the new caminho para o arquivo tempor·rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}
+   * @param tempPath the new caminho para o arquivo tempor√°rio onde encontramos o arquivo quando {@link FilePersistenceType} = {@link FilePersistenceType#S3}
    */
   public void setTempPath(String tempPath) {
     this.tempPath = tempPath;
   }
 
   /**
-   * # para arquivos persistidos no S3 n„o utilizaremos o nome do arquivo pois precisamos garantir um identificador ˙nico para que os arquivos n„o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID È utilizado como nome do arquivo.
+   * # para arquivos persistidos no S3 n√£o utilizaremos o nome do arquivo pois precisamos garantir um identificador √∫nico para que os arquivos n√£o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID √© utilizado como nome do arquivo.
    *
-   * @return the para arquivos persistidos no S3 n„o utilizaremos o nome do arquivo pois precisamos garantir um identificador ˙nico para que os arquivos n„o se sobreponham
+   * @return the para arquivos persistidos no S3 n√£o utilizaremos o nome do arquivo pois precisamos garantir um identificador √∫nico para que os arquivos n√£o se sobreponham
    */
   public String getFileUUID() {
     return fileUUID;
   }
 
   /**
-   * # para arquivos persistidos no S3 n„o utilizaremos o nome do arquivo pois precisamos garantir um identificador ˙nico para que os arquivos n„o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID È utilizado como nome do arquivo.
+   * # para arquivos persistidos no S3 n√£o utilizaremos o nome do arquivo pois precisamos garantir um identificador √∫nico para que os arquivos n√£o se sobreponham. Assim geramos um UUID que identifica o arquivo. No S3 esse UUID √© utilizado como nome do arquivo.
    *
-   * @param fileUUID the new para arquivos persistidos no S3 n„o utilizaremos o nome do arquivo pois precisamos garantir um identificador ˙nico para que os arquivos n„o se sobreponham
+   * @param fileUUID the new para arquivos persistidos no S3 n√£o utilizaremos o nome do arquivo pois precisamos garantir um identificador √∫nico para que os arquivos n√£o se sobreponham
    */
   public void setFileUUID(String fileUUID) {
     this.fileUUID = fileUUID;
   }
 
   /**
-   * # indica se o conte˙do do arquivo est· comprimido ou n„o.<Br>
-   * Quando comprimido È preciso descoprimir o conte˙do do arquivo antes de utiliza-lo.
+   * # indica se o conte√∫do do arquivo est√° comprimido ou n√£o.<Br>
+   * Quando comprimido √© preciso descoprimir o conte√∫do do arquivo antes de utiliza-lo.
    *
-   * @return the indica se o conte˙do do arquivo est· comprimido ou n„o
+   * @return the indica se o conte√∫do do arquivo est√° comprimido ou n√£o
    */
   public FileCompression getCompression() {
     return compression;
   }
 
   /**
-   * # indica se o conte˙do do arquivo est· comprimido ou n„o.<Br>
-   * Quando comprimido È preciso descoprimir o conte˙do do arquivo antes de utiliza-lo.
+   * # indica se o conte√∫do do arquivo est√° comprimido ou n√£o.<Br>
+   * Quando comprimido √© preciso descoprimir o conte√∫do do arquivo antes de utiliza-lo.
    *
-   * @param compression the new indica se o conte˙do do arquivo est· comprimido ou n„o
+   * @param compression the new indica se o conte√∫do do arquivo est√° comprimido ou n√£o
    */
   public void setCompression(FileCompression compression) {
     this.compression = compression;
@@ -391,7 +391,7 @@ public class FileVO extends RFWVO {
 
   /**
    * # caminho base do arquivo (pastas).<br>
-   * Este caminho ser· utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
+   * Este caminho ser√° utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
    * O caminho deve ser escrito no formato: "folder/subfolder1/../subfolderN/" SEMPRE TERMINANDO COM "/".
    *
    * @return # caminho base do arquivo (pastas)
@@ -402,7 +402,7 @@ public class FileVO extends RFWVO {
 
   /**
    * # caminho base do arquivo (pastas).<br>
-   * Este caminho ser· utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
+   * Este caminho ser√° utilizado ao salvar o arquivo no AWS, permitindo que o sistema separe em pastas os arquivos conforme achar conveniente. Por exemplo, por cliente, tipo de arquivo, etc.<br>
    * O caminho deve ser escrito no formato: "folder/subfolder1/../subfolderN/" SEMPRE TERMINANDO COM "/".
    *
    * @param basePath # caminho base do arquivo (pastas)

@@ -51,8 +51,8 @@ public class RFWS3Test {
   public void init() throws Exception {
     awsTestKey = RFW.getDevProperty("aws.s3.key");
     awsTestSecret = RFW.getDevProperty("aws.s3.secret");
-    PreProcess.requiredNonNull(awsTestKey, "Chave de acesso ao S3 n„o definida para realizar o teste!");
-    PreProcess.requiredNonNull(awsTestSecret, "Chave de acesso ao S3 n„o definida para realizar o teste!");
+    PreProcess.requiredNonNull(awsTestKey, "Chave de acesso ao S3 n√£o definida para realizar o teste!");
+    PreProcess.requiredNonNull(awsTestSecret, "Chave de acesso ao S3 n√£o definida para realizar o teste!");
     awsTestRegion = Region.US_EAST_1;
   }
 
@@ -111,14 +111,14 @@ public class RFWS3Test {
     // ### Testa recuperar as tags para o arquivo
     Map<String, String> tags2 = s3.getObjectTags(bucketName, objectKeyName);
     for (Entry<String, String> entry : tags.entrySet()) {
-      // Validamos se todas as chaves enviadas voltaram e n„o o contr·rio, pois podemos ter tags autom·ticas do s3 que n„o foram enviadas daqui.
+      // Validamos se todas as chaves enviadas voltaram e n√£o o contr√°rio, pois podemos ter tags autom√°ticas do s3 que n√£o foram enviadas daqui.
       String v = tags2.get(entry.getKey());
       assertEquals(entry.getValue(), v);
     }
 
-    // ### Lista os arquivos do Bucket e verifica se o encontramos na listagem (testa o mÈtodo de listagem)
-    // Este teste precisa ser revisto, pois o mÈtodo listOBject tem um limite de objetos que ele retorna, talvez ser mais preciso na busca ou descobrir como buscar outra p·gina para continuar a listagem.
-    // O fato È que o arquivo existe, mas o "chunk" da lista que È retornado n„o o inclui
+    // ### Lista os arquivos do Bucket e verifica se o encontramos na listagem (testa o m√©todo de listagem)
+    // Este teste precisa ser revisto, pois o m√©todo listOBject tem um limite de objetos que ele retorna, talvez ser mais preciso na busca ou descobrir como buscar outra p√°gina para continuar a listagem.
+    // O fato √© que o arquivo existe, mas o "chunk" da lista que √© retornado n√£o o inclui
     // boolean found = false;
     // for (S3Object s3Obj : s3.listObjects(bucketName)) {
     // if (s3Obj.key().equals(objectKeyName)) {
@@ -126,19 +126,19 @@ public class RFWS3Test {
     // break;
     // }
     // }
-    // if (!found) fail("O arquivo enviado para o S3 n„o apareceu na listagem de arquivos.");
+    // if (!found) fail("O arquivo enviado para o S3 n√£o apareceu na listagem de arquivos.");
 
     // ### Testa excluir o objeto
     final File file2 = RUFile.createFileInTemporaryPath("MySamplePDFFile.pdf");
     s3.deleteObjects(bucketName, objectKeyName);
 
-    // Tenta recuperar para ver se o objeto È retornado
+    // Tenta recuperar para ver se o objeto √© retornado
     try {
       s3.getObject(bucketName, objectKeyName, null, file2);
-      fail("O Objeto excluÌdo do S3 foi encontrado!");
+      fail("O Objeto exclu√≠do do S3 foi encontrado!");
     } catch (RFWException e) {
       if (!"RFW_000023".equals(e.getExceptionCode())) {
-        fail("O arquivo foi encontrado ou n„o obtivemos a exception prometida!");
+        fail("O arquivo foi encontrado ou n√£o obtivemos a exception prometida!");
       }
     }
   }
@@ -149,28 +149,28 @@ public class RFWS3Test {
     final String objectKeyName = awsTestFolder + "t01TestCase.pdf";
     final RFWS3 s3 = RFWS3.getInstance(awsTestKey, awsTestSecret, awsTestRegion);
 
-    // ### Enviar o arquivo N vezes o arquivo para criar 4 versıes
+    // ### Enviar o arquivo N vezes o arquivo para criar 4 vers√µes
     String[] versions = new String[5];
     for (int i = 0; i < versions.length; i++) {
       PutObjectResponse postResp = s3.putObject(bucketName, objectKeyName, new File(RFWS3Test.class.getResource("/resources/MySamplePDFFile.pdf").toURI()));
       versions[i] = postResp.versionId();
     }
 
-    // ### Recupera as versıes dele e confirme que foram feitas 5 versıes
+    // ### Recupera as vers√µes dele e confirme que foram feitas 5 vers√µes
     {
       ListObjectVersionsIterable list = s3.listObjectsVersionsIterable(bucketName, objectKeyName);
       for (ListObjectVersionsResponse objResp : list) {
-        assertEquals("Quantidade de versıes do arquivo diferente da esperada!", versions.length, objResp.versions().size());
+        assertEquals("Quantidade de vers√µes do arquivo diferente da esperada!", versions.length, objResp.versions().size());
       }
     }
 
-    // ### Tentamos excluir as duas versıes mais antigas primeiro
+    // ### Tentamos excluir as duas vers√µes mais antigas primeiro
     final ArrayList<Pair<String, String>> deleteList = new ArrayList<Pair<String, String>>();
     deleteList.add(new Pair<String, String>(objectKeyName, versions[0]));
     deleteList.add(new Pair<String, String>(objectKeyName, versions[1]));
     s3.deleteObjectsVersion(bucketName, deleteList);
 
-    // Validamos se as versıes que sobraram as as 3/4/5
+    // Validamos se as vers√µes que sobraram as as 3/4/5
     {
       ListObjectVersionsIterable list = s3.listObjectsVersionsIterable(bucketName, objectKeyName);
       HashSet<String> foundVers = new HashSet<String>();
@@ -179,17 +179,17 @@ public class RFWS3Test {
           foundVers.add(objVer.versionId());
         }
       }
-      assertEquals("Quantidade de versıes remanescentes do arquivo diferente da esperada!", foundVers.size(), versions.length - 2);
+      assertEquals("Quantidade de vers√µes remanescentes do arquivo diferente da esperada!", foundVers.size(), versions.length - 2);
     }
 
-    // ### ExcluÌmos o restante das versıes e garantimos que n„o sobrou nada.
+    // ### Exclu√≠mos o restante das vers√µes e garantimos que n√£o sobrou nada.
     deleteList.clear();
     deleteList.add(new Pair<String, String>(objectKeyName, versions[2]));
     deleteList.add(new Pair<String, String>(objectKeyName, versions[3]));
     deleteList.add(new Pair<String, String>(objectKeyName, versions[4]));
     s3.deleteObjectsVersion(bucketName, deleteList);
 
-    // Validamos se as versıes que sobraram as as 3/4/5
+    // Validamos se as vers√µes que sobraram as as 3/4/5
     {
       ListObjectVersionsIterable list = s3.listObjectsVersionsIterable(bucketName, objectKeyName);
       HashSet<String> foundVers = new HashSet<String>();
@@ -198,7 +198,7 @@ public class RFWS3Test {
           foundVers.add(objVer.versionId());
         }
       }
-      assertEquals("Era esperado que n„o sobrasse nenhuma vers„o do arquivo no bucket!", foundVers.size(), 0);
+      assertEquals("Era esperado que n√£o sobrasse nenhuma vers√£o do arquivo no bucket!", foundVers.size(), 0);
     }
   }
 
