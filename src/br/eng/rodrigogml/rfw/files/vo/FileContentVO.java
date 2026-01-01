@@ -8,9 +8,9 @@ import br.eng.rodrigogml.rfw.kernel.rfwmeta.RFWMetaRelationshipField.Relationshi
 import br.eng.rodrigogml.rfw.kernel.vo.RFWVO;
 
 /**
- * Description: Classe usada para guardar o conteúdo do arquivo separado das outras informações.<br>
+ * Description: Classe usada para guardar o conteÃºdo do arquivo separado das outras informaÃ§Ãµes.<br>
  *
- * @author Rodrigo Leitão
+ * @author Rodrigo LeitÃ£o
  * @since 3.2.0 (DEZ / 2009)
  */
 public class FileContentVO extends RFWVO implements Serializable {
@@ -18,48 +18,48 @@ public class FileContentVO extends RFWVO implements Serializable {
   private static final long serialVersionUID = 3302186106595703387L;
 
   /**
-   * Definições do Arquivo.
+   * DefiniÃ§Ãµes do Arquivo.
    */
   @RFWMetaRelationshipField(caption = "Arquivo", required = true, relationship = RelationshipTypes.PARENT_ASSOCIATION)
   private FileVO fileVO = null;
 
   /**
-   * Conteúdo do arquivo.
+   * ConteÃºdo do arquivo.
    */
-  @RFWMetaByteArrayField(caption = "Conteúdo", required = true)
+  @RFWMetaByteArrayField(caption = "ConteÃºdo", required = true)
   private byte[] content = null;
 
   /**
-   * Recupera o conteúdo do arquivo.
+   * Recupera o conteÃºdo do arquivo.
    *
-   * @return the conteúdo do arquivo
+   * @return the conteÃºdo do arquivo
    */
   public byte[] getContent() {
     return content;
   }
 
   /**
-   * Define o conteúdo do arquivo.
+   * Define o conteÃºdo do arquivo.
    *
-   * @param content the new conteúdo do arquivo
+   * @param content the new conteÃºdo do arquivo
    */
   public void setContent(byte[] content) {
     this.content = content;
   }
 
   /**
-   * Recupera o definições do Arquivo.
+   * Recupera o definiÃ§Ãµes do Arquivo.
    *
-   * @return the definições do Arquivo
+   * @return the definiÃ§Ãµes do Arquivo
    */
   public FileVO getFileVO() {
     return fileVO;
   }
 
   /**
-   * Define o definições do Arquivo.
+   * Define o definiÃ§Ãµes do Arquivo.
    *
-   * @param fileVO the new definições do Arquivo
+   * @param fileVO the new definiÃ§Ãµes do Arquivo
    */
   public void setFileVO(FileVO fileVO) {
     this.fileVO = fileVO;
