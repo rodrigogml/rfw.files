@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,12 +27,15 @@ public class RFWFilesCache {
 
   private static final long DEFAULT_TTL_MINUTES = 90L;
   private static final long DEFAULT_CLEANUP_INTERVAL_MINUTES = 60L;
+  private static final long DEFAULT_MAX_CACHE_SIZE_BYTES = -1L;
   private static final String DEFAULT_BASE_PATH = System.getProperty("java.io.tmpdir") + File.separator + "rfw-files-cache";
   private static final String PROP_TTL_MINUTES = "rfw.files.cache.ttl.minutes";
   private static final String PROP_CLEANUP_INTERVAL_MINUTES = "rfw.files.cache.cleanup.interval.minutes";
+  private static final String PROP_MAX_CACHE_SIZE_BYTES = "rfw.files.cache.max.size.bytes";
 
   private static volatile long ttlMinutes = DEFAULT_TTL_MINUTES;
   private static volatile long cleanupIntervalMinutes = DEFAULT_CLEANUP_INTERVAL_MINUTES;
+  private static volatile long maxCacheSizeBytes = DEFAULT_MAX_CACHE_SIZE_BYTES;
   private static volatile String basePath = DEFAULT_BASE_PATH;
 
   private volatile File cacheBaseDir;
@@ -85,6 +91,17 @@ public class RFWFilesCache {
     RFWFilesCache.cleanupIntervalMinutes = cleanupIntervalMinutes;
   }
 
+  public static synchronized long getMaxCacheSizeBytes() {
+    return maxCacheSizeBytes;
+  }
+
+  public static synchronized void setMaxCacheSizeBytes(long maxCacheSizeBytes) {
+    if (maxCacheSizeBytes != -1 && maxCacheSizeBytes <= 0) {
+      throw new IllegalArgumentException("maxCacheSizeBytes deve ser -1 (desabilitado) ou maior que zero.");
+    }
+    RFWFilesCache.maxCacheSizeBytes = maxCacheSizeBytes;
+  }
+
   public File get(FileVO vo) {
     return get(vo, null);
   }
@@ -119,14 +136,26 @@ public class RFWFilesCache {
       parent.mkdirs();
     }
 
+    final File tempFile = new File(parent, cachedFile.getName() + ".tmp-" + System.nanoTime());
     try {
-      Files.copy(sourceFile.toPath(), cachedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      throw new RuntimeException("Falha ao copiar arquivo para o cache: " + cachedFile.getAbsolutePath(), e);
-    }
+      Files.copy(sourceFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-    touch(cachedFile);
-    return cachedFile;
+      if (tempFile.length() <= 0L) {
+        tempFile.delete();
+        LOGGER.log(Level.WARNING, "Cache ignorado para arquivo vazio: {0}", cachedFile.getAbsolutePath());
+        return null;
+      }
+
+      Files.move(tempFile.toPath(), cachedFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+
+      touch(cachedFile);
+      enforceMaxCacheSizeIfNeeded();
+      return cachedFile;
+    } catch (IOException e) {
+      LOGGER.log(Level.WARNING, "Falha ao copiar arquivo para o cache: " + cachedFile.getAbsolutePath(), e);
+      tempFile.delete();
+      return null;
+    }
   }
 
   public void invalidate(FileVO vo) {
@@ -181,6 +210,7 @@ public class RFWFilesCache {
   private void loadConfigurationFromSystemProperties() {
     setPositiveLongFromProperty(PROP_TTL_MINUTES, true);
     setPositiveLongFromProperty(PROP_CLEANUP_INTERVAL_MINUTES, false);
+    setCacheSizeLimitFromProperty();
   }
 
   private void setPositiveLongFromProperty(String propertyName, boolean ttlProperty) {
@@ -203,6 +233,24 @@ public class RFWFilesCache {
       }
     } catch (NumberFormatException e) {
       LOGGER.log(Level.WARNING, "Não foi possível interpretar a propriedade {0}: {1}", new Object[] { propertyName, configuredValue });
+    }
+  }
+
+  private void setCacheSizeLimitFromProperty() {
+    final String configuredValue = System.getProperty(PROP_MAX_CACHE_SIZE_BYTES);
+    if (configuredValue == null || configuredValue.trim().isEmpty()) {
+      return;
+    }
+
+    try {
+      final long parsedValue = Long.parseLong(configuredValue.trim());
+      if (parsedValue != -1 && parsedValue <= 0) {
+        LOGGER.log(Level.WARNING, "Valor inválido para a propriedade {0}: {1}", new Object[] { PROP_MAX_CACHE_SIZE_BYTES, configuredValue });
+        return;
+      }
+      setMaxCacheSizeBytes(parsedValue);
+    } catch (NumberFormatException e) {
+      LOGGER.log(Level.WARNING, "Não foi possível interpretar a propriedade {0}: {1}", new Object[] { PROP_MAX_CACHE_SIZE_BYTES, configuredValue });
     }
   }
 
@@ -296,6 +344,52 @@ public class RFWFilesCache {
 
     if (removedFiles > 0) {
       LOGGER.log(Level.INFO, "Limpeza do cache removeu {0} arquivo(s).", removedFiles);
+    }
+
+    enforceMaxCacheSizeIfNeeded();
+  }
+
+  private void enforceMaxCacheSizeIfNeeded() {
+    final long limit = getMaxCacheSizeBytes();
+    if (limit < 0) {
+      return;
+    }
+
+    final File localBaseDir = updateCacheBaseDirIfNeeded();
+    if (!localBaseDir.exists() || !localBaseDir.isDirectory()) {
+      return;
+    }
+
+    final List<File> files = new ArrayList<File>();
+    long totalSize = 0L;
+    try (Stream<Path> stream = Files.walk(localBaseDir.toPath())) {
+      for (Path path : (Iterable<Path>) stream::iterator) {
+        final File file = path.toFile();
+        if (!file.isFile()) {
+          continue;
+        }
+        files.add(file);
+        totalSize += Math.max(file.length(), 0L);
+      }
+    } catch (IOException e) {
+      LOGGER.log(Level.WARNING, "Erro de I/O ao calcular tamanho do cache.", e);
+      return;
+    }
+
+    if (totalSize <= limit) {
+      return;
+    }
+
+    files.sort(Comparator.comparingLong(File::lastModified));
+    for (File file : files) {
+      if (totalSize <= limit) {
+        break;
+      }
+
+      final long fileSize = Math.max(file.length(), 0L);
+      if (file.delete()) {
+        totalSize -= fileSize;
+      }
     }
   }
 
