@@ -204,6 +204,32 @@ public class RUFiles {
   }
 
   /**
+   * Monta o filePath onde o arquivo será salvo no S3.
+   *
+   * @param fileVO Objeto com as informações para referência.
+   * @return Caminho para salvar ou recuperar o arquivo do Bucket do S3.
+   * @throws RFWException
+   */
+  public static String createS3FilePath(FileVO fileVO) throws RFWException {
+    StringBuilder buff = new StringBuilder();
+    if (fileVO.getBasePath() != null) {
+      if ('/' != fileVO.getBasePath().charAt(fileVO.getBasePath().length() - 1)) throw new RFWCriticalException("BasePath do FileVO deve sempre terminar com o '/'!");
+      buff.append(fileVO.getBasePath());
+    }
+    buff.append(fileVO.getFileUUID()).append(".");
+    switch (fileVO.getCompression()) {
+      case MAXIMUM_COMPRESSION:
+        buff.append("zip");
+        break;
+      case NONE:
+        buff.append(RUFile.extractFileExtension(fileVO.getName()));
+        break;
+    }
+
+    return buff.toString();
+  }
+
+  /**
    * Este método ajuda a extrair o arquivo correto do FileVO.<br>
    * Considerando {@link FileVO} com o tipo de persistência do tipo {@link FilePersistenceType#S3}, o arquivo apontado por {@link FileVO#getTempPath()} pode ser um arquivo compactado de alguma forma, conforme definido no {@link FileVO#getCompression()}. Este método verifica todas essas condições e, se necessário descompacta e deixa o arquivo no formato correto novamente, retornando o caminho de
    * onde encontrar o arquivo pronto.
