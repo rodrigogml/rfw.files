@@ -163,15 +163,43 @@ public class FilesCrud {
    * @throws RFWException
    */
   public static FileVO retrieveFileVOFromS3(FileVO vo, RFWS3 rfws3, String bucket) throws RFWException {
+    return retrieveFileVOFromS3(vo, rfws3, bucket, false);
+  }
+
+  /**
+   * Recupera um arquivo que esteja armazenado no S3 fazendo o download e salvando em um arquivo temporário no sistema.<br>
+   * O método só retorna depois que o download finalizar e o arquivo estiver disponível. <Br>
+   * Este método já escreve no {@link FileVO#getTempPath()} o caminho para o arquivo temporário com o conteúdo do arquivo.
+   *
+   * @param vo FileVO para acessar já com as informações do arquivo. Mesma função que o {@link #retrieveFileVOFromS3(Long)} mas evita a consulta no banco caso já tenhamos o objeto em memória.
+   * @param rfws3 Instância para manipulação do S3 já criado. Obrigatório quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @param bucket Nome do bucket do S3 para persistência. Obrigatório quando o {@link FileVO#getPersistenceType()} for do tipo {@link FilePersistenceType#S3}.
+   * @param forceS3Refresh Define se deve ignorar o cache e forçar o download do arquivo no S3.
+   * @return O mesmo objeto recebido com o atributo {@link FileVO#getTempPath()} definido com o caminho do arquivo temporário.
+   * @throws RFWException
+   */
+  public static FileVO retrieveFileVOFromS3(FileVO vo, RFWS3 rfws3, String bucket, boolean forceS3Refresh) throws RFWException {
     PreProcess.requiredNonNullCritical(vo, "FileVO não pode ser nulo!");
     PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO não contem uma versionID definida!");
+
+    if (!forceS3Refresh) {
+      File cachedFile = RFWFilesCache.getInstance().get(vo);
+      if (cachedFile != null) {
+        vo.setTempPath(cachedFile.getAbsolutePath());
+        return vo;
+      }
+    }
 
     String fileName = vo.getName();
     if (vo.getCompression() == FileCompression.MAXIMUM_COMPRESSION) {
       fileName = RUFile.extractFileName(fileName) + ".zip";
     }
-    File file = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileName, -1);
-    rfws3.getObject(bucket, createS3FilePath(vo), vo.getVersionID(), file);
+    File downloadedFile = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileName, -1);
+    rfws3.getObject(bucket, createS3FilePath(vo), vo.getVersionID(), downloadedFile);
+
+    RFWFilesCache.getInstance().put(vo, downloadedFile);
+    File cachedFile = RFWFilesCache.getInstance().get(vo);
+    File file = cachedFile != null ? cachedFile : downloadedFile;
 
     vo.setTempPath(file.getAbsolutePath());
     return vo;
