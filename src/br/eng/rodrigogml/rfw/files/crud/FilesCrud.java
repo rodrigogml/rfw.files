@@ -102,11 +102,11 @@ public class FilesCrud {
             final File file = new File(vo.getTempPath());
             if (!file.exists()) throw new RFWCriticalException("O arquivo do FileVO não pode ser encontrado! Falha ao postar o arquivo.");
 
-            final String s3Path = createS3FilePath(vo);
+            final String s3Path = RUFiles.createS3FilePath(vo);
 
             PutObjectResponse result = rfws3.putObject(bucket, s3Path, file);
             vo.setVersionID(result.versionId());
-            RFWFilesCache.getInstance().put(vo, file);
+            RFWFilesCache.getInstance().put(vo, file, bucket);
 
             // Criamos uma lista de Tags para auxiliar a identificar os atributos quando olhados no S3.
             HashMap<String, String> tagsMap = new HashMap<String, String>();
@@ -123,32 +123,6 @@ public class FilesCrud {
     }
 
     return vo;
-  }
-
-  /**
-   * Monta o filePath onde o arquivo será salvo na S3.
-   *
-   * @param fileVO Objeto com as informações para referência.
-   * @return Caminho para salvar ou recuperar o arquivo do Bucket do S3.
-   * @throws RFWException
-   */
-  private static String createS3FilePath(FileVO fileVO) throws RFWException {
-    StringBuilder buff = new StringBuilder();
-    if (fileVO.getBasePath() != null) {
-      if ('/' != fileVO.getBasePath().charAt(fileVO.getBasePath().length() - 1)) throw new RFWCriticalException("BasePath do FileVO deve sempre terminar com o '/'!");
-      buff.append(fileVO.getBasePath());
-    }
-    buff.append(fileVO.getFileUUID()).append(".");
-    switch (fileVO.getCompression()) {
-      case MAXIMUM_COMPRESSION:
-        buff.append("zip");
-        break;
-      case NONE:
-        buff.append(RUFile.extractFileExtension(fileVO.getName()));
-        break;
-    }
-
-    return buff.toString();
   }
 
   /**
@@ -183,7 +157,7 @@ public class FilesCrud {
     PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO não contem uma versionID definida!");
 
     if (!forceS3Refresh) {
-      File cachedFile = RFWFilesCache.getInstance().get(vo);
+      File cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
       if (cachedFile != null) {
         vo.setTempPath(cachedFile.getAbsolutePath());
         return vo;
@@ -195,10 +169,10 @@ public class FilesCrud {
       fileName = RUFile.extractFileName(fileName) + ".zip";
     }
     File downloadedFile = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileName, -1);
-    rfws3.getObject(bucket, createS3FilePath(vo), vo.getVersionID(), downloadedFile);
+    rfws3.getObject(bucket, RUFiles.createS3FilePath(vo), vo.getVersionID(), downloadedFile);
 
-    RFWFilesCache.getInstance().put(vo, downloadedFile);
-    File cachedFile = RFWFilesCache.getInstance().get(vo);
+    RFWFilesCache.getInstance().put(vo, downloadedFile, bucket);
+    File cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
     File file = cachedFile != null ? cachedFile : downloadedFile;
 
     vo.setTempPath(file.getAbsolutePath());
