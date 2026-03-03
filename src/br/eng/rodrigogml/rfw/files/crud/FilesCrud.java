@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import br.eng.rodrigogml.rfw.files.aws.RFWS3;
+import br.eng.rodrigogml.rfw.files.cache.RFWFilesCache;
 import br.eng.rodrigogml.rfw.files.utils.RUFiles;
 import br.eng.rodrigogml.rfw.files.vo.FileContentVO;
 import br.eng.rodrigogml.rfw.files.vo.FileContentVO_;
@@ -105,6 +106,7 @@ public class FilesCrud {
 
             PutObjectResponse result = rfws3.putObject(bucket, s3Path, file);
             vo.setVersionID(result.versionId());
+            RFWFilesCache.getInstance().put(vo, file);
 
             // Criamos uma lista de Tags para auxiliar a identificar os atributos quando olhados no S3.
             HashMap<String, String> tagsMap = new HashMap<String, String>();
