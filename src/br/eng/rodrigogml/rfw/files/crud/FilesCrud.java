@@ -106,7 +106,11 @@ public class FilesCrud {
 
             PutObjectResponse result = rfws3.putObject(bucket, s3Path, file);
             vo.setVersionID(result.versionId());
-            RFWFilesCache.getInstance().put(vo, file, bucket);
+            try {
+              RFWFilesCache.getInstance().put(vo, file, bucket);
+            } catch (RuntimeException e) {
+              // Cache é apenas otimização local e não pode interromper o fluxo principal de S3.
+            }
 
             // Criamos uma lista de Tags para auxiliar a identificar os atributos quando olhados no S3.
             HashMap<String, String> tagsMap = new HashMap<String, String>();
@@ -157,10 +161,14 @@ public class FilesCrud {
     PreProcess.requiredNonNullCritical(vo.getVersionID(), "FileVO não contem uma versionID definida!");
 
     if (!forceS3Refresh) {
-      File cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
-      if (cachedFile != null) {
-        vo.setTempPath(cachedFile.getAbsolutePath());
-        return vo;
+      try {
+        File cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
+        if (cachedFile != null) {
+          vo.setTempPath(cachedFile.getAbsolutePath());
+          return vo;
+        }
+      } catch (RuntimeException e) {
+        // Cache é apenas otimização local e não pode interromper o fluxo principal de S3.
       }
     }
 
@@ -171,8 +179,13 @@ public class FilesCrud {
     File downloadedFile = RUFile.createFileInGeneratedTemporaryPathWithDelete(fileName, -1);
     rfws3.getObject(bucket, RUFiles.createS3FilePath(vo), vo.getVersionID(), downloadedFile);
 
-    RFWFilesCache.getInstance().put(vo, downloadedFile, bucket);
-    File cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
+    File cachedFile = null;
+    try {
+      RFWFilesCache.getInstance().put(vo, downloadedFile, bucket);
+      cachedFile = RFWFilesCache.getInstance().get(vo, bucket);
+    } catch (RuntimeException e) {
+      // Cache é apenas otimização local e não pode interromper o fluxo principal de S3.
+    }
     File file = cachedFile != null ? cachedFile : downloadedFile;
 
     vo.setTempPath(file.getAbsolutePath());
